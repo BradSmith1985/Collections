@@ -337,7 +337,7 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 	}
 
 	int IList.Add(object value) {
-		Add((T)value);
+		AddLast((T)value);
 		return Count - 1;
 	}
 
