@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 using System.Collections;
 
 /// <summary>
-/// Represents a singly linked list.
+/// Represents a generic singly-linked list.
 /// </summary>
 /// <typeparam name="T">Specifies the element type of the linked list.</typeparam>
 public class SinglyLinkedList<T> : IList<T>, IList {
 
+	/// <summary>
+	/// Represents a node in a <see cref="SinglyLinkedList{T}"/>, comprising a 
+	/// value and a link to the next node in the list.
+	/// </summary>
 	private class Node {
 		public T Value;
 		public Node Next;
@@ -50,7 +54,6 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 			throw new ArgumentOutOfRangeException(nameof(index));
 		}
 	}
-
 	/// <summary>
 	/// Gets the number of elements contained in the <see cref="SinglyLinkedList{T}"/>.
 	/// </summary>
@@ -58,18 +61,6 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 	/// Retrieving the value of this property is an O(N) operation.
 	/// </remarks>
 	public int Count => this.Count<T>();
-
-	bool ICollection<T>.IsReadOnly => false;
-
-	bool IList.IsReadOnly => false;
-
-	bool IList.IsFixedSize => false;
-
-	object ICollection.SyncRoot => this;
-
-	bool ICollection.IsSynchronized => false;
-
-	object IList.this[int index] { get => this[index]; set => this[index] = (T)value; }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="SinglyLinkedList{T}"/> class 
@@ -96,10 +87,6 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 	public SinglyLinkedList(IEnumerable<T> collection, IEqualityComparer<T> comparer = null) : this(comparer) {
 		if (collection == null) throw new ArgumentNullException(nameof(collection));
 		AddRange(collection);
-	}
-
-	void ICollection<T>.Add(T item) {
-		AddLast(item);
 	}
 
 	/// <summary>
@@ -181,7 +168,13 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 	/// This method is an O(N) operation.
 	/// </remarks>
 	public bool Contains(T item) {
-		return this.Contains<T>(item);
+		Node node = _first;
+		while (node != null) {
+			if (_comparer.Equals(node.Value, item)) return true;
+			node = node.Next;
+		}
+
+		return false;
 	}
 
 	/// <summary>
@@ -332,37 +325,6 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 		throw new ArgumentOutOfRangeException(nameof(index));
 	}
 
-	IEnumerator IEnumerable.GetEnumerator() {
-		return GetEnumerator();
-	}
-
-	int IList.Add(object value) {
-		AddLast((T)value);
-		return Count - 1;
-	}
-
-	bool IList.Contains(object value) {
-		return (value is T) && Contains((T)value);
-	}
-
-	int IList.IndexOf(object value) {
-		return IndexOf((T)value);
-	}
-
-	void IList.Insert(int index, object value) {
-		Insert(index, (T)value);
-	}
-
-	void IList.Remove(object value) {
-		Remove((T)value);
-	}
-
-	void ICollection.CopyTo(Array array, int index) {
-		foreach (T value in this) {
-			array.SetValue(value, index++);
-		}
-	}
-
 	/// <summary>
 	/// Sorts the elements in the entire <see cref="SinglyLinkedList{T}"/> using the specified comparer.
 	/// </summary>
@@ -437,6 +399,57 @@ public class SinglyLinkedList<T> : IList<T>, IList {
 		frontRef = source;
 		backRef = slow.Next;
 		slow.Next = null;
+	}
+
+	#endregion
+
+	#region Explicit Interface Implementations
+
+	bool ICollection<T>.IsReadOnly => false;
+
+	bool IList.IsReadOnly => false;
+
+	bool IList.IsFixedSize => false;
+
+	object ICollection.SyncRoot => this;
+
+	bool ICollection.IsSynchronized => false;
+
+	object IList.this[int index] { get => this[index]; set => this[index] = (T)value; }
+
+	void ICollection<T>.Add(T item) {
+		AddLast(item);
+	}
+
+	IEnumerator IEnumerable.GetEnumerator() {
+		return GetEnumerator();
+	}
+
+	int IList.Add(object value) {
+		AddLast((T)value);
+		return Count - 1;
+	}
+
+	bool IList.Contains(object value) {
+		return (value is T) && Contains((T)value);
+	}
+
+	int IList.IndexOf(object value) {
+		return IndexOf((T)value);
+	}
+
+	void IList.Insert(int index, object value) {
+		Insert(index, (T)value);
+	}
+
+	void IList.Remove(object value) {
+		Remove((T)value);
+	}
+
+	void ICollection.CopyTo(Array array, int index) {
+		foreach (T value in this) {
+			array.SetValue(value, index++);
+		}
 	}
 
 	#endregion
